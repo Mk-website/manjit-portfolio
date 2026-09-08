@@ -1,0 +1,1 @@
+{"name":"portfolio","private":true,"workspaces":["client","server"],"scripts":{"dev":"concurrently \"npm run dev:server\" \"npm run dev:client\"","dev:server":"cd server && npm run dev","dev:client":"cd client && npm run dev","seed":"cd server && npm run seed"},"devDependencies":{"concurrently":"^9.1.2"}}
