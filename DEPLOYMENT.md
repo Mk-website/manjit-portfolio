@@ -38,6 +38,8 @@ Create a Vercel project from this repository with these settings:
 - Output directory: `dist`
 - Environment variable: `VITE_API_URL=https://your-render-service.onrender.com`
 
+Keep the Vercel root directory set to `client`. The `client/vercel.json` rewrite sends direct visits to routes such as `/admin/login` and `/projects` to the React app instead of returning a Vercel 404.
+
 Set `VITE_API_URL` for every Vercel environment that should load portfolio data, then redeploy. Vite injects `VITE_*` variables during the build, so changing the variable requires a new deployment.
 
 After frontend deployment, set Render's `CLIENT_URL` to the exact Vercel production URL, for example `https://your-portfolio.vercel.app`, and redeploy the Render service. Do not include a trailing slash. For Vercel preview deployments, use the production deployment URL for testing or add preview-origin support before sharing preview URLs.
