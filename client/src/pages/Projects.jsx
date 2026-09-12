@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Code2, ExternalLink, X } from 'lucide-react';
+import { ArrowUpRight, Code2, ExternalLink, Layers3, X } from 'lucide-react';
 import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
@@ -28,32 +28,36 @@ export default function Projects() {
 
       {!state.loading && (
         <div className="case-grid">
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <article key={project._id} className="panel panel-hover case-card">
               {project.imageUrl ? (
                 <img src={project.imageUrl} alt={project.name} className="aspect-video w-full object-cover" />
               ) : (
-                <div className="case-visual tech-grid">
-                  <ProjectVisual project={project} />
-                </div>
+                <ProjectVisual project={project} index={index} />
               )}
 
               <div className="case-content">
                 <div className="case-header">
-                  <h2>{project.name}</h2>
-                  {project.featured && <span className="tag">Featured</span>}
+                  <div>
+                    <p className="case-kicker">Case study / {String(index + 1).padStart(2, '0')}</p>
+                    <h2>{project.name}</h2>
+                  </div>
+                  <span className={`case-status ${project.featured ? 'is-featured' : ''}`}>
+                    {project.featured ? 'Featured' : 'Built'}
+                  </span>
                 </div>
                 <p className="case-meta">{project.shortDesc}</p>
 
                 <div className="case-tags">
-                  {project.technologies?.map((item) => (
-                    <span key={item} className="tag">{item}</span>
+                  {project.technologies?.slice(0, 4).map((item) => (
+                    <span key={item} className="case-tech">{item}</span>
                   ))}
+                  {project.technologies?.length > 4 && <span className="case-tech">+{project.technologies.length - 4}</span>}
                 </div>
 
                 <div className="case-actions">
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => setSelected(project)}>
-                    Details
+                    Explore project <ArrowUpRight size={15} />
                   </button>
                   {project.githubUrl && (
                     <a className="btn btn-secondary btn-sm" href={project.githubUrl} target="_blank" rel="noreferrer">
@@ -83,7 +87,7 @@ export default function Projects() {
           <div className="panel modal-card">
             <div className="modal-top">
               <div>
-                <p className="eyebrow">Project details</p>
+                <p className="eyebrow"><Layers3 size={14} /> Project details</p>
                 <h2 id="project-title">{selected.name}</h2>
               </div>
               <button

@@ -7,11 +7,17 @@ export function SystemDiagram() {
   </div>;
 }
 
-export function ProjectVisual({ project }) {
+export function ProjectVisual({ project, index = 0 }) {
   const weather = /weather/i.test(project.name || '');
-  return <div className="tech-grid flex aspect-video flex-col justify-between border-b border-slate-800 p-5">
-    <div className="flex items-center justify-between font-mono text-[.68rem] text-cyan-300"><span>{weather ? 'TELEMETRY PIPELINE' : 'REGISTER MAP'}</span><span>01</span></div>
-    {weather ? <div className="flex items-center gap-2"><div className="tech-node">ESP32</div><div className="tech-link" /><div className="tech-node">AZURE<br />IOT</div><div className="tech-link" /><div className="tech-node">ALERTS</div></div> : <div className="grid grid-cols-3 gap-2"><div className="tech-node">GPIO</div><div className="tech-node">I2C</div><div className="tech-node">SPI</div><div className="tech-node">UART</div><div className="tech-node col-span-2">STM32F401</div></div>}
-    <span className="font-mono text-[.68rem] text-slate-500">CSS SYSTEM VISUAL</span>
+  const nodes = weather ? ['ESP32', 'AZURE IOT', 'ALERTS'] : ['GPIO', 'I2C', 'SPI', 'UART', 'STM32F401'];
+  return <div className={`case-visual tech-grid ${weather ? 'is-weather' : 'is-firmware'}`}>
+    <div className="visual-topline"><span>{weather ? 'TELEMETRY PIPELINE' : 'REGISTER MAP'}</span><span>{String(index + 1).padStart(2, '0')} / LIVE</span></div>
+    <div className="visual-system">
+      {nodes.map((node, nodeIndex) => <div className="visual-node-wrap" key={node}>
+        <div className="visual-node">{node}</div>
+        {nodeIndex < nodes.length - 1 && <div className="visual-connector" />}
+      </div>)}
+    </div>
+    <div className="visual-footer"><span>ENGINEERING SYSTEM</span><span className="visual-pulse" /></div>
   </div>;
 }
