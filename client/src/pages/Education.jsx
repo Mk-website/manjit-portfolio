@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 export default function Education() {
   const state = useApiData(api.education.get, []);
@@ -15,7 +16,7 @@ export default function Education() {
       <ApiNotice error={state.error} retry={state.retry} loading={state.loading} />
 
       {!state.loading && (
-        <div className="edu-grid">
+        <Reveal className="edu-grid" stagger>
           {state.data.map((item) => (
             <article className="panel panel-hover edu-card" key={item._id}>
               <div className="edu-head">
@@ -32,9 +33,9 @@ export default function Education() {
           ))}
 
           {!state.data.length && !state.error && (
-            <p className="text-slate-400">Education entries will appear here when they are added.</p>
+            <p className="empty-state">Education entries will appear here when they are added.</p>
           )}
-        </div>
+        </Reveal>
       )}
     </main>
   );

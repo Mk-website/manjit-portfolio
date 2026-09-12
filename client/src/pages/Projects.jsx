@@ -5,6 +5,7 @@ import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
 import { ProjectVisual } from '../components/TechnicalVisual.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 export default function Projects() {
   const state = useApiData(api.projects.get, []);
@@ -27,7 +28,7 @@ export default function Projects() {
       <ApiNotice error={state.error} retry={state.retry} loading={state.loading} />
 
       {!state.loading && (
-        <div className="case-grid">
+        <Reveal className="case-grid" stagger>
           {projects.map((project, index) => (
             <article key={project._id} className="panel panel-hover case-card">
               {project.imageUrl ? (
@@ -77,9 +78,9 @@ export default function Projects() {
           ))}
 
           {!projects.length && !state.error && (
-            <p className="text-slate-400">Projects will appear here when they are added.</p>
+            <p className="empty-state">Projects will appear here when they are added.</p>
           )}
-        </div>
+        </Reveal>
       )}
 
       {selected && (

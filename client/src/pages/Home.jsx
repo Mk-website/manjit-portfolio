@@ -5,6 +5,7 @@ import { useApiData } from '../hooks/useApiData.js';
 import { fallbackProfile } from '../data/fallbackProfile.js';
 import ApiNotice from '../components/ApiNotice.jsx';
 import { SystemDiagram } from '../components/TechnicalVisual.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 const features = [
   { icon: Cpu, title: 'Firmware design', text: 'Bare-metal and HAL-driven embedded software designed for real hardware constraints and testability.' },
@@ -21,7 +22,7 @@ export default function Home() {
 
   return (
     <main className="page-wrap hero-page">
-      <section className="hero-grid">
+      <Reveal as="section" className="hero-grid">
         <div className="hero-copy">
           <p className="hero-kicker">
             <span className="signal-dot" />
@@ -90,9 +91,9 @@ export default function Home() {
         <div className="hero-visual">
           <SystemDiagram />
         </div>
-      </section>
+      </Reveal>
 
-      <section className="feature-grid" aria-label="Core engineering strengths">
+      <Reveal as="section" className="feature-grid" stagger aria-label="Core engineering strengths">
         {features.map(({ icon: Icon, title, text }) => (
           <article key={title} className="panel panel-hover feature-card">
             <div className="feature-icon">
@@ -102,7 +103,7 @@ export default function Home() {
             <p>{text}</p>
           </article>
         ))}
-      </section>
+      </Reveal>
     </main>
   );
 }

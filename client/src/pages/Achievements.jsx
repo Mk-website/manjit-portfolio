@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 export default function Achievements() {
   const state = useApiData(api.achievements.get, []);
@@ -15,7 +16,7 @@ export default function Achievements() {
       <ApiNotice error={state.error} retry={state.retry} loading={state.loading} />
 
       {!state.loading && (
-        <div className="case-grid">
+        <Reveal className="case-grid" stagger>
           {state.data.map((item) => (
             <article className="panel panel-hover case-card" key={item._id}>
               <div className="case-content">
@@ -30,9 +31,9 @@ export default function Achievements() {
           ))}
 
           {!state.data.length && !state.error && (
-            <p className="text-slate-400">Achievements will appear here when they are added.</p>
+            <p className="empty-state">Achievements will appear here when they are added.</p>
           )}
-        </div>
+        </Reveal>
       )}
     </main>
   );

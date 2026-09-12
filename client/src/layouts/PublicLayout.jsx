@@ -129,11 +129,35 @@ function Navbar() {
 }
 
 export default function PublicLayout() {
+  const location = useLocation();
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mobile = window.matchMedia('(max-width: 640px)');
+    if (reduceMotion.matches || mobile.matches) return undefined;
+
+    const updateGrid = (event) => {
+      const x = ((event.clientX / window.innerWidth) - 0.5) * 8;
+      const y = ((event.clientY / window.innerHeight) - 0.5) * 8;
+      document.documentElement.style.setProperty('--grid-x', `${x}px`);
+      document.documentElement.style.setProperty('--grid-y', `${y}px`);
+    };
+
+    window.addEventListener('pointermove', updateGrid, { passive: true });
+    return () => window.removeEventListener('pointermove', updateGrid);
+  }, []);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <div className="app-shell">
       <Navbar />
-      <main className="page-main">
-        <Outlet />
+      <main key={location.pathname} className="page-main route-transition">
+        {ready ? <Outlet /> : <PageSkeleton />}
       </main>
       <footer className="site-footer">
         <div className="footer-inner">
@@ -141,6 +165,17 @@ export default function PublicLayout() {
           <p className="footer-mark">MERN PORTFOLIO / 2026</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function PageSkeleton() {
+  return (
+    <div className="skeleton-page" aria-label="Loading portfolio">
+      <div className="skeleton-block" style={{ width: '7rem', height: '0.8rem' }} />
+      <div className="skeleton-block" style={{ width: 'min(26rem, 80%)', height: '4rem', marginTop: '1rem' }} />
+      <div className="skeleton-block" style={{ width: 'min(38rem, 100%)', height: '1.2rem', marginTop: '1.2rem' }} />
+      <div className="skeleton-block" style={{ width: '100%', height: '18rem', marginTop: '3rem' }} />
     </div>
   );
 }

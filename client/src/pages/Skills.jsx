@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 const categoryIcons = {
   Languages: Code2,
@@ -35,7 +36,7 @@ export default function Skills() {
 
       {!state.loading && (
         <>
-          <div className="skill-grid">
+          <Reveal className="skill-grid" stagger>
             {Object.entries(groups).map(([category, skills]) => {
               const Icon = categoryIcons[category] || Wrench;
               return (
@@ -52,21 +53,21 @@ export default function Skills() {
                 </section>
               );
             })}
-          </div>
+          </Reveal>
 
           {!state.data.length && !state.error && (
-            <p className="mt-10 text-slate-400">Skills will appear here when they are added to the portfolio.</p>
+            <p className="empty-state empty-state-spaced">Skills will appear here when they are added to the portfolio.</p>
           )}
 
           {tools.length > 0 && (
-            <section className="panel toolchain">
+            <Reveal as="section" className="panel toolchain">
               <p className="eyebrow">Toolchain</p>
               <div className="skill-badges">
                 {tools.map((tool) => (
                   <span className="tag" key={tool._id || tool.name}>{tool.name}</span>
                 ))}
               </div>
-            </section>
+            </Reveal>
           )}
         </>
       )}

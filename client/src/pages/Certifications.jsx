@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 export default function Certifications() {
   const state = useApiData(api.certifications.get, []);
@@ -16,7 +17,7 @@ export default function Certifications() {
 
       {!state.loading && (
         state.data.length ? (
-          <div className="cert-grid">
+          <Reveal className="cert-grid" stagger>
             {state.data.map((item) => (
               <article className="panel panel-hover cert-card" key={item._id}>
                 <div className="cert-head">
@@ -38,7 +39,7 @@ export default function Certifications() {
                 )}
               </article>
             ))}
-          </div>
+          </Reveal>
         ) : !state.error ? (
           <div className="panel tech-grid" style={{ marginTop: '1.5rem', padding: '2rem 1.5rem', textAlign: 'center' }}>
             <BadgeCheck size={26} style={{ margin: '0 auto', color: 'var(--text-muted)' }} />

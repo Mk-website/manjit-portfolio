@@ -4,6 +4,7 @@ import { useApiData } from '../hooks/useApiData.js';
 import { fallbackProfile } from '../data/fallbackProfile.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 const areas = [
   { title: 'Firmware Design', icon: Cpu, copy: 'Focused on practical embedded implementation and clean firmware interfaces that are easy to validate.' },
@@ -19,21 +20,27 @@ export default function About() {
   return (
     <main className="page-wrap">
       <PageHeader eyebrow="01 / engineering profile" title="About">
-        {profile.summary}
+        A firmware engineer building a deeper understanding of how software, signals, and physical hardware become dependable systems.
       </PageHeader>
       <ApiNotice error={state.error} retry={state.retry} />
 
-      <div className="story-grid">
+      <Reveal className="story-grid" stagger>
         <section className="panel story-card">
-          <p className="eyebrow">Professional focus</p>
-          <h2>Engineering interests</h2>
+          <p className="eyebrow">The path so far</p>
+          <h2>Close to the hardware</h2>
+          <p className="story-copy">
+            My technical journey started with a curiosity about what happens between a line of code and a physical response. Embedded systems gave that curiosity a place to become practical: timing matters, interfaces have consequences, and every reliable result has to survive contact with real hardware.
+          </p>
+          <p className="story-copy">
+            I got into embedded engineering through [TODO: add the specific project, person, or moment that first drew you into embedded systems]. That experience made the work feel tangible and set the direction for my focus on firmware, wireless links, and hardware-aware debugging.
+          </p>
           <div className="chip-row">
             {(profile.interests || []).map((item) => (
               <span className="tag" key={item}>{item}</span>
             ))}
           </div>
 
-          <h2 style={{ marginTop: '2rem' }}>Core strengths</h2>
+          <h2 className="section-subheading">Core strengths</h2>
           <ul className="check-list">
             {(profile.strengths || []).map((item) => (
               <li key={item}>{item}</li>
@@ -41,27 +48,18 @@ export default function About() {
           </ul>
         </section>
 
-        <aside className="panel accent-panel tech-grid" style={{ padding: '1.4rem' }}>
-          <p className="eyebrow">Experience signal</p>
-          <div className="metric-stack">
-            <div className="metric-row">
-              <strong>{profile.yearsExperience || 0}</strong>
-              <span>year{profile.yearsExperience === 1 ? '' : 's'} of applied work</span>
-            </div>
-            <div className="metric-row">
-              <strong>4</strong>
-              <span>core engineering focus areas</span>
-            </div>
-            <div className="metric-row">
-              <strong>1</strong>
-              <span>practical product mindset</span>
-            </div>
-          </div>
-          {profile.location && <p style={{ marginTop: '1.2rem', color: 'var(--text-soft)' }}>{profile.location}</p>}
+        <aside className="panel accent-panel tech-grid currently-card">
+          <p className="eyebrow">Currently building</p>
+          <h2>From working firmware to field-ready systems.</h2>
+          <p className="story-copy">
+            I am working toward stronger end-to-end ownership: designing firmware that is observable, communicating clearly across hardware boundaries, and learning how to make embedded products easier to test, maintain, and trust.
+          </p>
+          <p className="story-copy todo-copy">[TODO: add the specific technology, project, or next role you are currently working toward.]</p>
+          {profile.location && <p className="location-line">{profile.location}</p>}
         </aside>
-      </div>
+      </Reveal>
 
-      <div className="feature-grid">
+      <Reveal className="feature-grid" stagger>
         {areas.map(({ title, copy, icon: Icon }) => (
           <article key={title} className="panel panel-hover feature-card">
             <div className="feature-icon">
@@ -71,9 +69,9 @@ export default function About() {
             <p>{copy}</p>
           </article>
         ))}
-      </div>
+      </Reveal>
 
-      <section className="panel" style={{ marginTop: '1.2rem', padding: '1.3rem 1.2rem' }}>
+      <Reveal as="section" className="panel approach-card">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           <div>
             <p className="eyebrow">Approach</p>
@@ -81,7 +79,7 @@ export default function About() {
           </div>
           <ArrowRight size={18} style={{ color: 'var(--accent)' }} />
         </div>
-      </section>
+      </Reveal>
     </main>
   );
 }

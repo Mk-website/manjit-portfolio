@@ -5,6 +5,7 @@ import { useApiData } from '../hooks/useApiData.js';
 import { fallbackProfile } from '../data/fallbackProfile.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 const initialForm = { name: '', email: '', subject: '', body: '', website: '' };
 
@@ -48,7 +49,7 @@ export default function Contact() {
       </PageHeader>
       <ApiNotice error={profileState.error} retry={profileState.retry} />
 
-      <div className="contact-grid">
+      <Reveal className="contact-grid" stagger>
         <aside className="panel contact-card tech-grid">
           <p className="eyebrow">Direct channels</p>
           <div className="direct-list">
@@ -118,7 +119,7 @@ export default function Contact() {
             )}
           </div>
         </form>
-      </div>
+      </Reveal>
     </main>
   );
 }

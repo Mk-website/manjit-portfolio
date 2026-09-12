@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 import PageHeader from '../components/PageHeader.jsx';
 import ApiNotice from '../components/ApiNotice.jsx';
+import Reveal from '../components/Reveal.jsx';
 
 const date = (value) =>
   value ? new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' }).format(new Date(value)) : '';
@@ -18,7 +19,7 @@ export default function Experience() {
       <ApiNotice error={state.error} retry={state.retry} loading={state.loading} />
 
       {!state.loading && (
-        <div className="timeline-grid">
+        <Reveal className="timeline-grid" stagger>
           {state.data.map((role, index) => (
             <article key={role._id} className="timeline-item">
               <span className="timeline-dot" aria-hidden="true" />
@@ -69,9 +70,9 @@ export default function Experience() {
           ))}
 
           {!state.data.length && !state.error && (
-            <p className="text-slate-400">Experience entries will appear here when they are added.</p>
+            <p className="empty-state">Experience entries will appear here when they are added.</p>
           )}
-        </div>
+        </Reveal>
       )}
     </main>
   );
