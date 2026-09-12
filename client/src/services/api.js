@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL, withCredentials: true });
+const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+
+if (!apiUrl && import.meta.env.PROD) {
+  console.error('VITE_API_URL is missing. Set it to the deployed Render API URL in Vercel.');
+}
+
+const API = axios.create({ baseURL: apiUrl, withCredentials: true });
 
 API.interceptors.response.use(
   (response) => response,

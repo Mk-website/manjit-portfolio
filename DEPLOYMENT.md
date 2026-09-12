@@ -29,14 +29,18 @@ COOKIE_SECRET=<long random secret>
 
 Run `npm run seed` once using the same variables to initialize content and the sole super-admin account.
 
-## Cloudflare Pages frontend
+## Vercel frontend
+
+Create a Vercel project from this repository with these settings:
 
 - Root directory: `client`
 - Build command: `npm run build`
 - Output directory: `dist`
-- Environment: `VITE_API_URL=https://your-render-service.onrender.com`
+- Environment variable: `VITE_API_URL=https://your-render-service.onrender.com`
 
-After frontend deployment, update Render `CLIENT_URL` to the exact production frontend URL and redeploy.
+Set `VITE_API_URL` for every Vercel environment that should load portfolio data, then redeploy. Vite injects `VITE_*` variables during the build, so changing the variable requires a new deployment.
+
+After frontend deployment, set Render's `CLIENT_URL` to the exact Vercel production URL, for example `https://your-portfolio.vercel.app`, and redeploy the Render service. Do not include a trailing slash. For Vercel preview deployments, use the production deployment URL for testing or add preview-origin support before sharing preview URLs.
 
 ## Free-tier limits
 
