@@ -1,15 +1,19 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun, Download } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
 
 function Navbar() {
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const { theme, toggle } = useTheme();
   const location = useLocation();
   const { data: resume } = useApiData(api.resume.get, null);
+
   const links = [
     { to: '/home', label: 'Home' },
     { to: '/about', label: 'About' },
@@ -17,47 +21,124 @@ function Navbar() {
     { to: '/experience', label: 'Experience' },
     { to: '/projects', label: 'Projects' },
     { to: '/education', label: 'Education' },
-    { to: '/contact', label: 'Contact' }
+    { to: '/contact', label: 'Contact' },
   ];
+
+  useEffect(() => {
+    let lastScroll = window.scrollY;
+
+    const updateNavState = () => {
+      const currentScroll = window.scrollY;
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const nextProgress = maxScroll > 0 ? (currentScroll / maxScroll) * 100 : 0;
+
+      setProgress(Math.min(Math.max(nextProgress, 0), 100));
+      setScrolled(currentScroll > 20);
+      setVisible(currentScroll < 80 || currentScroll < lastScroll);
+      lastScroll = currentScroll;
+    };
+
+    updateNavState();
+    window.addEventListener('scroll', updateNavState, { passive: true });
+    return () => window.removeEventListener('scroll', updateNavState);
+  }, []);
+
+  const isActive = (to) =>
+    location.pathname === to || (to === '/home' && location.pathname === '/');
+
   const close = () => setOpen(false);
-  return <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/85 backdrop-blur">
-      <div className="mx-auto flex h-16 w-[min(1120px,calc(100%-2rem))] items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 text-sm font-semibold text-slate-100"><span className="grid h-8 w-8 place-items-center border border-cyan-700 bg-cyan-950 font-mono text-xs text-cyan-200">MK</span><span className="hidden sm:block">Manjit Kumar</span></Link>
-          <nav className="hidden items-center gap-5 lg:flex">
-            {links.map(l => (
-              <Link key={l.to} to={l.to} className={`text-sm ${location.pathname === l.to || (l.to === '/home' && location.pathname === '/') ? 'text-cyan-300' : 'text-slate-400 hover:text-slate-100'}`}>{l.label}</Link>
+
+  return (
+    <header className={`site-header ${visible ? 'site-header-visible' : 'site-header-hidden'} ${scrolled ? 'site-header-scrolled' : ''}`}>
+      <div className="scroll-progress" style={{ width: `${progress}%` }} />
+      <div className="nav-shell">
+        <Link to="/" className="brand" aria-label="Go to home page">
+          <span className="brand-badge">MK</span>
+          <span className="brand-text">Manjit Kumar</span>
+        </Link>
+
+        <nav className="desktop-nav" aria-label="Primary navigation">
+          {links.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`nav-link ${isActive(link.to) ? 'nav-link-active' : ''}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="nav-actions desktop-actions">
+          {resume?.fileUrl && (
+            <a href={resume.fileUrl} download className="btn btn-secondary btn-sm">
+              <Download size={15} />
+              Resume
+            </a>
+          )}
+          <Link to="/contact" className="btn btn-primary btn-sm">
+            Contact me
+          </Link>
+          <button
+            type="button"
+            onClick={toggle}
+            className="icon-button"
+            aria-label="Toggle color theme"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="icon-button mobile-menu-button"
+          onClick={() => setOpen((value) => !value)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={open}
+        >
+          {open ? <X size={18} /> : <Menu size={18} />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="mobile-menu">
+          <nav className="mobile-nav" aria-label="Mobile navigation">
+            {links.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                onClick={close}
+                className={`mobile-link ${isActive(link.to) ? 'mobile-link-active' : ''}`}
+              >
+                {link.label}
+              </Link>
             ))}
           </nav>
-          <div className="hidden items-center gap-2 md:flex">
-            {resume?.fileUrl && <a href={resume.fileUrl} download className="btn-secondary"><Download size={15} />Resume</a>}
-            <Link to="/contact" className="btn-primary">Contact me</Link>
-            <button onClick={toggle} className="grid h-9 w-9 place-items-center border border-slate-700 text-slate-300 hover:bg-slate-900" aria-label="Toggle theme">
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <div className="mobile-actions">
+            <Link to="/contact" onClick={close} className="btn btn-primary mobile-cta">
+              Contact me
+            </Link>
+            <button type="button" onClick={toggle} className="btn btn-secondary" aria-label="Toggle theme">
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
-          <button className="grid h-9 w-9 place-items-center border border-slate-700 text-slate-200 md:hidden" onClick={() => setOpen(o => !o)} aria-label="Toggle navigation menu">{open ? <X size={18} /> : <Menu size={18} />}</button>
-      </div>
-      {open && (
-        <div className="border-t border-slate-800 bg-slate-950 md:hidden">
-          <nav className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-1 py-3">
-            {links.map(l => (
-              <Link key={l.to} to={l.to} onClick={close} className="px-2 py-2 text-sm text-slate-300 hover:bg-slate-900">{l.label}</Link>
-            ))}
-            <div className="mt-2 flex gap-2"><Link to="/contact" onClick={close} className="btn-primary flex-1">Contact me</Link><button onClick={toggle} className="btn-secondary" aria-label="Toggle theme">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button></div>
-          </nav>
         </div>
       )}
-    </header>;
+    </header>
+  );
 }
 
 export default function PublicLayout() {
   return (
-    <div className="app-shell flex min-h-screen flex-col">
+    <div className="app-shell">
       <Navbar />
-      <main className="flex-1"><Outlet /></main>
-      <footer className="border-t border-slate-800 py-7 text-sm text-slate-500">
-        <div className="mx-auto flex w-[min(1120px,calc(100%-2rem))] flex-col gap-2 sm:flex-row sm:justify-between">
-          <p>Manjit Kumar · Embedded Firmware Engineer</p><p className="font-mono text-xs">MERN PORTFOLIO / 2026</p>
+      <main className="page-main">
+        <Outlet />
+      </main>
+      <footer className="site-footer">
+        <div className="footer-inner">
+          <p>Manjit Kumar · Embedded Firmware Engineer</p>
+          <p className="footer-mark">MERN PORTFOLIO / 2026</p>
         </div>
       </footer>
     </div>
