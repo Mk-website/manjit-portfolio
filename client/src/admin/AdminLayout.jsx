@@ -1,9 +1,9 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Award, BadgeCheck, Briefcase, FileText, FolderKanban, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, Trophy, User, X } from 'lucide-react';
+import { Award, BadgeCheck, Briefcase, FileText, FolderKanban, GraduationCap, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, Tags, Trophy, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { api } from '../services/api.js';
 
-const nav = [{ to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard }, { to: '/admin/profile', label: 'Profile', icon: User }, { to: '/admin/skills', label: 'Skills', icon: Award }, { to: '/admin/experience', label: 'Experience', icon: Briefcase }, { to: '/admin/projects', label: 'Projects', icon: FolderKanban }, { to: '/admin/education', label: 'Education', icon: GraduationCap }, { to: '/admin/certifications', label: 'Certifications', icon: BadgeCheck }, { to: '/admin/achievements', label: 'Achievements', icon: Trophy }, { to: '/admin/messages', label: 'Messages', icon: MessageSquare }, { to: '/admin/resume', label: 'Resume', icon: FileText }, { to: '/admin/settings', label: 'Settings', icon: Settings }];
+const nav = [{ to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard }, { to: '/admin/profile', label: 'Profile', icon: User }, { to: '/admin/skills', label: 'Skills', icon: Award }, { to: '/admin/skill-categories', label: 'Skill categories', icon: Tags }, { to: '/admin/experience', label: 'Experience', icon: Briefcase }, { to: '/admin/projects', label: 'Projects', icon: FolderKanban }, { to: '/admin/project-categories', label: 'Project categories', icon: Tags }, { to: '/admin/education', label: 'Education', icon: GraduationCap }, { to: '/admin/certifications', label: 'Certifications', icon: BadgeCheck }, { to: '/admin/achievements', label: 'Achievements', icon: Trophy }, { to: '/admin/messages', label: 'Messages', icon: MessageSquare }, { to: '/admin/resume', label: 'Resume', icon: FileText }, { to: '/admin/settings', label: 'Settings', icon: Settings }];
 
 export default function AdminLayout() {
   const [open, setOpen] = useState(false); const navigate = useNavigate(); const location = useLocation();

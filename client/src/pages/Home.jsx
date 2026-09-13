@@ -32,6 +32,7 @@ export default function Home() {
           <h1 className="hero-title">{profile.heroTitle || profile.name}</h1>
           <p className="hero-subtitle">{profile.heroSubtitle || profile.title}</p>
           <p className="hero-summary">{profile.heroDescription || profile.summary}</p>
+          {profile.photo?.url || profile.photoUrl ? <img src={profile.photo?.url || profile.photoUrl} alt={profile.photo?.alt || profile.name || ''} className="hero-profile-image" /> : null}
 
           <div className="chip-row">
             {chips.map((chip) => (
@@ -70,6 +71,8 @@ export default function Home() {
               Email
             </a>
           </div>
+
+          {profile.availabilityStatus && <p className="availability-line">{profile.availabilityStatus}</p>}
 
           <div className="mini-metrics">
             <article className="metric-card">

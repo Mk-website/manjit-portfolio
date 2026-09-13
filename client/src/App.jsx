@@ -19,8 +19,10 @@ import AdminLayout from './admin/AdminLayout.jsx';
 import AdminDashboard from './admin/AdminDashboard.jsx';
 import AdminProfile from './admin/AdminProfile.jsx';
 import AdminSkills from './admin/AdminSkills.jsx';
+import AdminSkillCategories from './admin/AdminSkillCategories.jsx';
 import AdminExperience from './admin/AdminExperience.jsx';
 import AdminProjects from './admin/AdminProjects.jsx';
+import AdminProjectCategories from './admin/AdminProjectCategories.jsx';
 import AdminEducation from './admin/AdminEducation.jsx';
 import AdminCertifications from './admin/AdminCertifications.jsx';
 import AdminAchievements from './admin/AdminAchievements.jsx';
@@ -60,8 +62,10 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="skills" element={<AdminSkills />} />
+          <Route path="skill-categories" element={<AdminSkillCategories />} />
           <Route path="experience" element={<AdminExperience />} />
           <Route path="projects" element={<AdminProjects />} />
+          <Route path="project-categories" element={<AdminProjectCategories />} />
           <Route path="education" element={<AdminEducation />} />
           <Route path="certifications" element={<AdminCertifications />} />
           <Route path="achievements" element={<AdminAchievements />} />

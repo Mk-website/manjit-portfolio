@@ -23,16 +23,17 @@ export default function About() {
         A firmware engineer building a deeper understanding of how software, signals, and physical hardware become dependable systems.
       </PageHeader>
       <ApiNotice error={state.error} retry={state.retry} />
+      {profile.photo?.url || profile.photoUrl ? <img src={profile.photo?.url || profile.photoUrl} alt={profile.photo?.alt || profile.name || ''} className="story-profile-image" /> : null}
 
       <Reveal className="story-grid" stagger>
         <section className="panel story-card">
           <p className="eyebrow">The path so far</p>
           <h2>Close to the hardware</h2>
           <p className="story-copy">
-            My technical journey started with a curiosity about what happens between a line of code and a physical response. Embedded systems gave that curiosity a place to become practical: timing matters, interfaces have consequences, and every reliable result has to survive contact with real hardware.
+            {profile.summary || 'A practical engineering profile shaped by firmware, hardware, and reliable system behavior.'}
           </p>
           <p className="story-copy">
-            My interest in embedded engineering grew from the moment I started working directly with hardware behavior, timing constraints, and signal reliability. That practical understanding shaped my focus on firmware, wireless links, and debugging systems that must survive real-world conditions.
+            {profile.heroDescription || profile.heroSubtitle || profile.title || 'Focused on building dependable embedded systems.'}
           </p>
           <div className="chip-row">
             {(profile.interests || []).map((item) => (

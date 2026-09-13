@@ -31,6 +31,18 @@ export const api = {
     get: () => API.get('/api/profile'),
     update: (data) => API.put('/api/profile', data),
   },
+  skillCategories: crud('skill-categories'),
+  projectCategories: crud('project-categories'),
+  media: {
+    upload: (file, folder) => {
+      const body = new FormData();
+      body.append('file', file);
+      body.append('folder', folder);
+      return API.post('/api/media/upload', body, { headers: { 'Content-Type': 'multipart/form-data' } });
+    },
+    validate: (url) => API.post('/api/media/validate', { url }),
+    remove: (key) => API.delete(`/api/media/${key}`),
+  },
   skills: crud('skills'),
   experience: crud('experience'),
   projects: { ...crud('projects'), getOne: (id) => API.get(`/api/projects/${id}`) },

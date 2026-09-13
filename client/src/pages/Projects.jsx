@@ -10,7 +10,7 @@ import Reveal from '../components/Reveal.jsx';
 export default function Projects() {
   const state = useApiData(api.projects.get, []);
   const [selected, setSelected] = useState(null);
-  const projects = [...state.data].sort(
+  const projects = [...(state.data || [])].sort(
     (a, b) => Number(b.featured) - Number(a.featured) || (a.displayOrder || 0) - (b.displayOrder || 0),
   );
 
@@ -28,6 +28,10 @@ export default function Projects() {
     { title: 'Hardware', content: selected?.hardware },
     { title: 'Firmware', content: selected?.firmware },
     { title: 'Implementation', content: selected?.implementation },
+    { title: 'Testing / validation', content: selected?.testing },
+    { title: 'Challenges', content: selected?.challenges },
+    { title: 'Results / outcomes', content: selected?.results },
+    { title: 'Role / contribution', content: selected?.role },
   ].filter((section) => section.content && String(section.content).trim());
 
   return (
@@ -39,57 +43,63 @@ export default function Projects() {
 
       {!state.loading && (
         <Reveal className="case-grid" stagger>
-          {projects.map((project, index) => (
-            <article key={project._id} className="panel panel-hover case-card case-card-premium">
-              {project.imageUrl ? (
-                <img src={project.imageUrl} alt={project.name} className="case-image" loading="lazy" decoding="async" />
-              ) : (
-                <ProjectVisual project={project} index={index} />
-              )}
-
-              <div className="case-content">
-                <div className="case-header">
-                  <div>
-                    <p className="case-kicker">{project.category || 'Case study'} / {String(index + 1).padStart(2, '0')}</p>
-                    <h2>{project.name}</h2>
-                  </div>
-                  <span className={`case-status ${project.featured ? 'is-featured' : ''}`}>
-                    {project.featured ? 'Featured' : project.status === 'draft' ? 'Draft' : 'Built'}
-                  </span>
-                </div>
-                <p className="case-meta">{project.shortDesc}</p>
-
-                {(project.protocols?.length || project.technologies?.length) && (
-                  <div className="case-tags">
-                    {(project.protocols || []).slice(0, 3).map((item) => (
-                      <span key={item} className="case-tech">{item}</span>
-                    ))}
-                    {(project.technologies || []).slice(0, 2).map((item) => (
-                      <span key={item} className="case-tech">{item}</span>
-                    ))}
-                  </div>
+          {projects.map((project, index) => {
+            const primaryImage = project.coverImage?.url || project.imageUrl;
+            return (
+              <article key={project._id} className="panel panel-hover case-card case-card-premium">
+                {primaryImage ? (
+                  <figure>
+                    <img src={primaryImage} alt={project.coverImage?.alt || project.name} className="case-image" loading="lazy" decoding="async" />
+                    {project.coverImage?.caption && <figcaption className="case-image-caption">{project.coverImage.caption}</figcaption>}
+                  </figure>
+                ) : (
+                  <ProjectVisual project={project} index={index} />
                 )}
 
-                <div className="case-actions">
-                  <button type="button" className="btn btn-primary btn-sm" onClick={() => setSelected(project)}>
-                    Explore project <ArrowUpRight size={15} />
-                  </button>
-                  {project.githubUrl && (
-                    <a className="btn btn-secondary btn-sm" href={project.githubUrl} target="_blank" rel="noreferrer">
-                      <Code2 size={15} />
-                      Code
-                    </a>
+                <div className="case-content">
+                  <div className="case-header">
+                    <div>
+                      <p className="case-kicker">{project.categoryName || project.category || 'Case study'} / {String(index + 1).padStart(2, '0')}</p>
+                      <h2>{project.name}</h2>
+                    </div>
+                    <span className={`case-status ${project.featured ? 'is-featured' : ''}`}>
+                      {project.featured ? 'Featured' : project.status === 'draft' ? 'Draft' : 'Built'}
+                    </span>
+                  </div>
+                  <p className="case-meta">{project.shortDesc}</p>
+
+                  {(project.protocols?.length || project.technologies?.length) && (
+                    <div className="case-tags">
+                      {(project.protocols || []).slice(0, 3).map((item) => (
+                        <span key={item} className="case-tech">{item}</span>
+                      ))}
+                      {(project.technologies || []).slice(0, 2).map((item) => (
+                        <span key={item} className="case-tech">{item}</span>
+                      ))}
+                    </div>
                   )}
-                  {project.liveUrl && (
-                    <a className="btn btn-secondary btn-sm" href={project.liveUrl} target="_blank" rel="noreferrer">
-                      <ExternalLink size={15} />
-                      Live demo
-                    </a>
-                  )}
+
+                  <div className="case-actions">
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => setSelected(project)}>
+                      Explore project <ArrowUpRight size={15} />
+                    </button>
+                    {project.githubUrl && (
+                      <a className="btn btn-secondary btn-sm" href={project.githubUrl} target="_blank" rel="noreferrer">
+                        <Code2 size={15} />
+                        Code
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a className="btn btn-secondary btn-sm" href={project.liveUrl} target="_blank" rel="noreferrer">
+                        <ExternalLink size={15} />
+                        Live demo
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
 
           {!projects.length && !state.error && (
             <p className="empty-state">Projects will appear here when they are added.</p>
@@ -116,7 +126,7 @@ export default function Projects() {
             </div>
 
             <div className="project-modal-summary">
-              <span className="tag">{selected.category || 'Embedded Systems'}</span>
+              <span className="tag">{selected.categoryName || selected.category || 'Embedded Systems'}</span>
               {selected.featured && <span className="tag">Featured</span>}
               {selected.status && <span className="tag">{selected.status}</span>}
             </div>
@@ -140,11 +150,17 @@ export default function Projects() {
               ))}
             </div>
 
-            {(selected.galleryImages?.length || selected.githubUrl || selected.liveUrl || selected.documentationUrl) && (
+            {(selected.gallery?.length || selected.galleryImages?.length || selected.githubUrl || selected.liveUrl || selected.documentationUrl) && (
               <div className="project-links-row">
-                {selected.galleryImages?.slice(0, 3).map((image, index) => (
-                  <img key={`${image}-${index}`} src={image} alt={`${selected.name} gallery ${index + 1}`} className="project-gallery-thumb" loading="lazy" decoding="async" />
-                ))}
+                {(selected.gallery || selected.galleryImages || []).map((image, index) => {
+                  const media = typeof image === 'string' ? { url: image } : image;
+                  return (
+                    <figure key={`${media.url || image}-${index}`}>
+                      <img src={media.url} alt={media.alt || `${selected.name} gallery ${index + 1}`} className="project-gallery-thumb" loading="lazy" decoding="async" />
+                      {media.caption && <figcaption className="text-xs text-slate-400">{media.caption}</figcaption>}
+                    </figure>
+                  );
+                })}
                 {selected.githubUrl && (
                   <a className="btn btn-secondary btn-sm" href={selected.githubUrl} target="_blank" rel="noreferrer">
                     <Code2 size={15} /> Code
@@ -160,6 +176,16 @@ export default function Projects() {
                     <ExternalLink size={15} /> Docs
                   </a>
                 )}
+                {selected.videoUrl && (
+                  <a className="btn btn-secondary btn-sm" href={selected.videoUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink size={15} /> Video
+                  </a>
+                )}
+                {(selected.links || []).filter((link) => link.url && ![selected.githubUrl, selected.liveUrl, selected.documentationUrl, selected.videoUrl].includes(link.url)).map((link) => (
+                  <a key={`${link.label}-${link.url}`} className="btn btn-secondary btn-sm" href={link.url} target="_blank" rel="noreferrer">
+                    <ExternalLink size={15} /> {link.label || 'Related link'}
+                  </a>
+                ))}
               </div>
             )}
           </div>

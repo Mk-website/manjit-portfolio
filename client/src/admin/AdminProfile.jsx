@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { api } from '../services/api.js';
 import SingletonForm from './components/SingletonForm.jsx';
 import { Input, Textarea, joinList, parseList } from './components/ui.jsx';
+import MediaManager from './components/MediaManager.jsx';
 
 const emptyForm = {
   name: '',
@@ -27,6 +28,7 @@ const emptyForm = {
   interests: [],
   strengths: [],
   photoUrl: '',
+  photo: null,
   socials: { github: '', linkedin: '', email: '' },
 };
 
@@ -70,12 +72,12 @@ export default function AdminProfile() {
             <Input label="Primary CTA URL" value={form.primaryCtaUrl} onChange={(e) => setForm((f) => ({ ...f, primaryCtaUrl: e.target.value }))} />
             <Input label="Secondary CTA label" value={form.secondaryCtaText} onChange={(e) => setForm((f) => ({ ...f, secondaryCtaText: e.target.value }))} />
             <Input label="Secondary CTA URL" value={form.secondaryCtaUrl} onChange={(e) => setForm((f) => ({ ...f, secondaryCtaUrl: e.target.value }))} />
-            <Input label="Photo URL" value={form.photoUrl} onChange={(e) => setForm((f) => ({ ...f, photoUrl: e.target.value }))} className="sm:col-span-2" />
           </div>
           <Input label="Hero title override" value={form.heroTitle} onChange={(e) => setForm((f) => ({ ...f, heroTitle: e.target.value }))} />
           <Input label="Hero subtitle" value={form.heroSubtitle} onChange={(e) => setForm((f) => ({ ...f, heroSubtitle: e.target.value }))} />
           <Textarea label="Hero description" value={form.heroDescription} onChange={(e) => setForm((f) => ({ ...f, heroDescription: e.target.value }))} rows={3} />
           <Textarea label="Summary" value={form.summary} onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))} rows={5} />
+          <MediaManager label="Profile image" value={form.photo || form.photoUrl} onChange={(value) => setForm((f) => ({ ...f, photo: value, photoUrl: value?.url || '' }))} folder="profile" />
           <Input label="Tech stack (comma-separated)" value={joinList(form.techStack)} onChange={(e) => setForm((f) => ({ ...f, techStack: e.target.value }))} />
           <Input label="Interests (comma-separated)" value={joinList(form.interests)} onChange={(e) => setForm((f) => ({ ...f, interests: e.target.value }))} />
           <Input label="Strengths (comma-separated)" value={joinList(form.strengths)} onChange={(e) => setForm((f) => ({ ...f, strengths: e.target.value }))} />

@@ -4,6 +4,7 @@ const schema=new mongoose.Schema({
   metaDescription:{type:String,default:'Portfolio of Manjit Kumar, an Embedded Firmware Engineer specializing in STM32, LoRa, and wireless TX/RX systems.'},
   ogTitle:{type:String,default:''},
   ogDescription:{type:String,default:''},
+  ogImage:{type:String,default:''},
   logoText:{type:String,default:'MK'},
   canonicalUrl:{type:String,default:''},
   resumeUrl:{type:String,default:''},

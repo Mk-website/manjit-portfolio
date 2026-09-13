@@ -21,11 +21,12 @@ const toolchain = new Set(['STM32CubeIDE', 'Keil IDE', 'Arduino IDE', 'Git', 'Gi
 
 export default function Skills() {
   const state = useApiData(api.skills.get, []);
-  const groups = state.data.reduce((all, item) => ({
-    ...all,
-    [item.category]: [...(all[item.category] || []), item],
-  }), {});
-  const tools = state.data.filter((item) => toolchain.has(item.name));
+  const groups = (state.data || []).reduce((all, item) => {
+    const key = item.categoryName || item.category || 'General';
+    all[key] = [...(all[key] || []), item];
+    return all;
+  }, {});
+  const tools = (state.data || []).filter((item) => toolchain.has(item.name));
   const sortedGroups = Object.entries(groups).sort(([left], [right]) => left.localeCompare(right));
 
   return (
@@ -49,7 +50,12 @@ export default function Skills() {
                   <div className="skill-list">
                     {skills.map((skill) => (
                       <div key={skill._id || skill.name} className="skill-pill-wrap">
-                        <span className="tag skill-pill">{skill.name}</span>
+                        <div className="flex items-center gap-2">
+                          {skill.icon && <span className="tag skill-pill">{skill.icon}</span>}
+                          {skill.media?.[0]?.url && <img src={skill.media[0].url} alt={skill.media[0].alt || ''} className="h-8 w-8 rounded object-cover" />}
+                          <span className="tag skill-pill">{skill.name}</span>
+                          {Number.isFinite(Number(skill.proficiency)) && <span className="text-xs text-cyan-300">{skill.proficiency}%</span>}
+                        </div>
                         {skill.description && <p className="skill-description">{skill.description}</p>}
                       </div>
                     ))}

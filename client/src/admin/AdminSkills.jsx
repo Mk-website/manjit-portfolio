@@ -1,10 +1,18 @@
+import { useEffect, useState } from 'react';
 import { api } from '../services/api.js';
 import CrudPage from './components/CrudPage.jsx';
-import { Checkbox, Input } from './components/ui.jsx';
+import { Checkbox, Input, Select } from './components/ui.jsx';
+import MediaManager from './components/MediaManager.jsx';
 
-const emptyForm = { name: '', category: '', description: '', icon: '', proficiency: 70, displayOrder: 0, isActive: true };
+const emptyForm = { name: '', category: '', categoryId: '', categoryName: '', description: '', icon: '', proficiency: 70, displayOrder: 0, isActive: true, media: [] };
 
 export default function AdminSkills() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    api.skillCategories.get().then((res) => setCategories(res.data.data || [])).catch(() => setCategories([]));
+  }, []);
+
   return (
     <CrudPage
       title="Skills"
@@ -20,11 +28,27 @@ export default function AdminSkills() {
       ]}
       renderForm={(form, setForm) => (
         <>
-          <Input label="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
-          <Input label="Category" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} required />
-          <Input label="Icon (optional)" value={form.icon} onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))} />
-          <Input label="Proficiency (0–100)" type="number" min="0" max="100" value={form.proficiency} onChange={(e) => setForm((f) => ({ ...f, proficiency: Number(e.target.value) }))} />
-          <Input label="Display order" type="number" value={form.displayOrder} onChange={(e) => setForm((f) => ({ ...f, displayOrder: Number(e.target.value) }))} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input label="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+            <Input label="Proficiency (0–100)" type="number" min="0" max="100" value={form.proficiency} onChange={(e) => setForm((f) => ({ ...f, proficiency: Number(e.target.value) }))} />
+            <Input label="Display order" type="number" value={form.displayOrder} onChange={(e) => setForm((f) => ({ ...f, displayOrder: Number(e.target.value) }))} />
+            <Input label="Icon (optional)" value={form.icon} onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))} />
+          </div>
+          <Select label="Category" value={form.categoryId || form.category || ''} onChange={(e) => {
+            const selected = categories.find((category) => String(category._id) === e.target.value);
+            setForm((f) => ({
+              ...f,
+              categoryId: selected ? selected._id : '',
+              categoryName: selected ? selected.name : f.category || '',
+              category: selected ? selected.name : f.category || '',
+            }));
+          }}>
+            <option value="">Select category</option>
+            {categories.map((category) => (
+              <option key={category._id} value={category._id}>{category.name}</option>
+            ))}
+          </Select>
+          {categories.length === 0 && <p className="text-sm text-amber-300">Create an active skill category before assigning this skill.</p>}
           <textarea
             value={form.description || ''}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -33,6 +57,7 @@ export default function AdminSkills() {
             placeholder="Short description or context for this skill"
           />
           <Checkbox label="Active" checked={!!form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
+          <MediaManager label="Skill icon / image" value={form.media} onChange={(value) => setForm((f) => ({ ...f, media: value }))} folder="skills" />
         </>
       )}
     />
