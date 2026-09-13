@@ -6,6 +6,11 @@ import { Input, Select, Textarea } from './components/ui.jsx';
 const emptyForm = {
   siteTitle: '',
   metaDescription: '',
+  ogTitle: '',
+  ogDescription: '',
+  logoText: '',
+  canonicalUrl: '',
+  resumeUrl: '',
   footerText: '',
   theme: 'dark',
   socials: { github: '', linkedin: '', email: '' },
@@ -26,6 +31,11 @@ export default function AdminSettings() {
         <>
           <Input label="Site title" value={form.siteTitle} onChange={(e) => setForm((f) => ({ ...f, siteTitle: e.target.value }))} />
           <Textarea label="Meta description" value={form.metaDescription} onChange={(e) => setForm((f) => ({ ...f, metaDescription: e.target.value }))} rows={3} />
+          <Input label="Open Graph title" value={form.ogTitle} onChange={(e) => setForm((f) => ({ ...f, ogTitle: e.target.value }))} />
+          <Textarea label="Open Graph description" value={form.ogDescription} onChange={(e) => setForm((f) => ({ ...f, ogDescription: e.target.value }))} rows={3} />
+          <Input label="Logo text" value={form.logoText} onChange={(e) => setForm((f) => ({ ...f, logoText: e.target.value }))} />
+          <Input label="Canonical URL" value={form.canonicalUrl} onChange={(e) => setForm((f) => ({ ...f, canonicalUrl: e.target.value }))} />
+          <Input label="Resume URL" value={form.resumeUrl} onChange={(e) => setForm((f) => ({ ...f, resumeUrl: e.target.value }))} />
           <Input label="Footer text" value={form.footerText} onChange={(e) => setForm((f) => ({ ...f, footerText: e.target.value }))} />
           <Select label="Theme" value={form.theme} onChange={(e) => setForm((f) => ({ ...f, theme: e.target.value }))}>
             <option value="dark">Dark</option>

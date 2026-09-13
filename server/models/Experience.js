@@ -8,6 +8,7 @@ const schema=new mongoose.Schema({
   isCurrent:{type:Boolean,default:false},
   description:{type:String,default:''},
   responsibilities:{type:[String],default:[]},
+  achievements:{type:[String],default:[]},
   technologies:{type:[String],default:[]},
   displayOrder:{type:Number,default:0},
   isActive:{type:Boolean,default:true}

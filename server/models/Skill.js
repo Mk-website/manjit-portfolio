@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 const schema=new mongoose.Schema({
   name:{type:String,required:true},
   category:{type:String,required:true},
+  description:{type:String,default:''},
   icon:{type:String,default:''},
   proficiency:{type:Number,min:0,max:100,default:70},
   displayOrder:{type:Number,default:0},

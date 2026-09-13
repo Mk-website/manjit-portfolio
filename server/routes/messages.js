@@ -7,8 +7,12 @@ const router=express.Router();
 const limiter=rateLimit({windowMs:60000,max:5,message:{success:false,message:'Too many requests, please try again later.'}});
 router.post('/',limiter,async(req,res,next)=>{
   try{
-    const{name,email,subject,body}=req.body;
+    const name=typeof req.body?.name==='string'?req.body.name.trim():'';
+    const email=typeof req.body?.email==='string'?req.body.email.trim().toLowerCase():'';
+    const subject=typeof req.body?.subject==='string'?req.body.subject.trim():'';
+    const body=typeof req.body?.body==='string'?req.body.body.trim():'';
     if(!name||!email||!subject||!body)return res.status(400).json({success:false,message:'All fields are required'});
+    if(name.length>120||email.length>254||subject.length>200||body.length>5000||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return res.status(400).json({success:false,message:'Please provide valid message details'});
     const ipHash=crypto.createHash('sha256').update(req.ip||'').digest('hex').slice(0,16);
     const item=await Message.create({name,email,subject,body,ipHash});
     res.status(201).json({success:true,message:'Message sent',data:{id:item._id}});

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { api } from '../services/api.js';
 import { useApiData } from '../hooks/useApiData.js';
+import { fallbackProfile } from '../data/fallbackProfile.js';
 
 function Navbar() {
   const [open, setOpen] = useState(false);
@@ -12,7 +13,9 @@ function Navbar() {
   const [progress, setProgress] = useState(0);
   const { theme, toggle } = useTheme();
   const location = useLocation();
+  const { data: profile } = useApiData(api.profile.get, fallbackProfile);
   const { data: resume } = useApiData(api.resume.get, null);
+  const { data: settings } = useApiData(api.settings.get, { siteTitle: '', footerText: '', socials: {} });
 
   const links = [
     { to: '/home', label: 'Home' },
@@ -47,14 +50,16 @@ function Navbar() {
     location.pathname === to || (to === '/home' && location.pathname === '/');
 
   const close = () => setOpen(false);
+  const currentProfile = profile || fallbackProfile;
+  const resumeUrl = resume?.fileUrl || currentProfile.resumeUrl;
 
   return (
     <header className={`site-header ${visible ? 'site-header-visible' : 'site-header-hidden'} ${scrolled ? 'site-header-scrolled' : ''}`}>
       <div className="scroll-progress" style={{ width: `${progress}%` }} />
       <div className="nav-shell">
         <Link to="/" className="brand" aria-label="Go to home page">
-          <span className="brand-badge">MK</span>
-          <span className="brand-text">Manjit Kumar</span>
+          <span className="brand-badge">{(settings?.logoText || currentProfile.name || 'MK').slice(0, 2).toUpperCase()}</span>
+          <span className="brand-text">{settings?.siteTitle ? settings.siteTitle.split('|')[0].trim() : currentProfile.name}</span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
@@ -70,8 +75,8 @@ function Navbar() {
         </nav>
 
         <div className="nav-actions desktop-actions">
-          {resume?.fileUrl && (
-            <a href={resume.fileUrl} download className="btn btn-secondary btn-sm">
+          {resumeUrl && (
+            <a href={resumeUrl} download className="btn btn-secondary btn-sm">
               <Download size={15} />
               Resume
             </a>
@@ -131,6 +136,38 @@ function Navbar() {
 export default function PublicLayout() {
   const location = useLocation();
   const [ready, setReady] = useState(false);
+  const { data: profile } = useApiData(api.profile.get, fallbackProfile);
+  const { data: settings } = useApiData(api.settings.get, { siteTitle: '', metaDescription: '', footerText: '', socials: {} });
+
+  useEffect(() => {
+    const siteTitle = settings?.siteTitle || `${profile?.name || 'Manjit Kumar'} | ${profile?.title || 'Embedded Firmware Engineer'}`;
+    const metaDescription = settings?.metaDescription || (profile?.summary || 'Embedded firmware engineer portfolio');
+    const socialTitle = settings?.ogTitle || siteTitle;
+    const socialDescription = settings?.ogDescription || metaDescription;
+    const canonicalBase = (settings?.canonicalUrl || window.location.origin).replace(/\/$/, '');
+    const canonicalUrl = `${canonicalBase}${location.pathname === '/' ? '' : location.pathname}`;
+
+    document.title = siteTitle;
+    const setMeta = (selector, attribute, content) => {
+      const meta = document.querySelector(selector);
+      if (meta) meta.setAttribute(attribute, content);
+    };
+
+    setMeta('meta[name="description"]', 'content', metaDescription);
+    setMeta('meta[property="og:title"]', 'content', socialTitle);
+    setMeta('meta[property="og:description"]', 'content', socialDescription);
+    setMeta('meta[property="og:url"]', 'content', canonicalUrl);
+    setMeta('meta[name="twitter:title"]', 'content', socialTitle);
+    setMeta('meta[name="twitter:description"]', 'content', socialDescription);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', canonicalUrl);
+  }, [location.pathname, profile, settings]);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -161,7 +198,21 @@ export default function PublicLayout() {
       </main>
       <footer className="site-footer">
         <div className="footer-inner">
-          <p>Manjit Kumar · Embedded Firmware Engineer</p>
+          <div>
+            <p className="footer-brand">{profile?.name || 'Manjit Kumar'} · {profile?.title || 'Embedded Firmware Engineer'}</p>
+            {(settings?.footerText || profile?.summary) && <p className="footer-text">{settings?.footerText || profile?.summary}</p>}
+          </div>
+          <div className="footer-links">
+            {(settings?.socials?.github || profile?.socials?.github || profile?.github) && (
+              <a href={settings?.socials?.github || profile?.socials?.github || profile?.github} target="_blank" rel="noreferrer">GitHub</a>
+            )}
+            {(settings?.socials?.linkedin || profile?.socials?.linkedin || profile?.linkedin) && (
+              <a href={settings?.socials?.linkedin || profile?.socials?.linkedin || profile?.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+            )}
+            {(settings?.socials?.email || profile?.socials?.email || profile?.email) && (
+              <a href={`mailto:${settings?.socials?.email || profile?.socials?.email || profile?.email}`}>Email</a>
+            )}
+          </div>
           <p className="footer-mark">MERN PORTFOLIO / 2026</p>
         </div>
       </footer>

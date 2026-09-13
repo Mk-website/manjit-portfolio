@@ -18,7 +18,8 @@ export default function Home() {
   const profileState = useApiData(api.profile.get, fallbackProfile);
   const resumeState = useApiData(api.resume.get, null);
   const profile = profileState.data || fallbackProfile;
-  const chips = ['STM32F401', 'LoRa SX1262', 'Wireless TX/RX', 'UART / SPI / I2C', 'IoT'];
+  const chips = profile.techStack?.length ? profile.techStack : ['STM32F401', 'LoRa SX1262', 'Wireless TX/RX', 'UART / SPI / I2C', 'IoT'];
+  const architectureNodes = profile.architectureNodes || profile.systemArchitecture?.nodes || chips.slice(0, 3);
 
   return (
     <main className="page-wrap hero-page">
@@ -26,11 +27,11 @@ export default function Home() {
         <div className="hero-copy">
           <p className="hero-kicker">
             <span className="signal-dot" />
-            Embedded firmware portfolio
+            {profile.heroEyebrow || 'Embedded firmware portfolio'}
           </p>
-          <h1 className="hero-title">{profile.name}</h1>
-          <p className="hero-subtitle">{profile.title}</p>
-          <p className="hero-summary">{profile.summary}</p>
+          <h1 className="hero-title">{profile.heroTitle || profile.name}</h1>
+          <p className="hero-subtitle">{profile.heroSubtitle || profile.title}</p>
+          <p className="hero-summary">{profile.heroDescription || profile.summary}</p>
 
           <div className="chip-row">
             {chips.map((chip) => (
@@ -39,16 +40,16 @@ export default function Home() {
           </div>
 
           <div className="action-row">
-            <Link to="/projects" className="btn btn-primary">
-              View projects
+            <Link to={profile.primaryCtaUrl || '/projects'} className="btn btn-primary">
+              {profile.primaryCtaText || 'View projects'}
               <ArrowRight size={16} />
             </Link>
-            <Link to="/contact" className="btn btn-secondary">
-              Contact me
+            <Link to={profile.secondaryCtaUrl || '/contact'} className="btn btn-secondary">
+              {profile.secondaryCtaText || 'Contact me'}
               <Mail size={16} />
             </Link>
-            {resumeState.data?.fileUrl && (
-              <a href={resumeState.data.fileUrl} download className="btn btn-secondary">
+            {(resumeState.data?.fileUrl || profile.resumeUrl) && (
+              <a href={resumeState.data?.fileUrl || profile.resumeUrl} download className="btn btn-secondary">
                 <Download size={16} />
                 Resume
               </a>
@@ -89,7 +90,7 @@ export default function Home() {
         </div>
 
         <div className="hero-visual">
-          <SystemDiagram />
+          <SystemDiagram nodes={architectureNodes} />
         </div>
       </Reveal>
 

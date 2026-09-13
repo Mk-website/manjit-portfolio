@@ -20,6 +20,16 @@ export default function Projects() {
     return () => window.removeEventListener('keydown', close);
   }, []);
 
+  const detailSections = [
+    { title: 'Overview', content: selected?.fullDesc || selected?.shortDesc },
+    { title: 'Problem', content: selected?.problem },
+    { title: 'Solution', content: selected?.solution },
+    { title: 'Architecture', content: selected?.architecture },
+    { title: 'Hardware', content: selected?.hardware },
+    { title: 'Firmware', content: selected?.firmware },
+    { title: 'Implementation', content: selected?.implementation },
+  ].filter((section) => section.content && String(section.content).trim());
+
   return (
     <main className="page-wrap">
       <PageHeader eyebrow="04 / selected work" title="Projects">
@@ -30,9 +40,9 @@ export default function Projects() {
       {!state.loading && (
         <Reveal className="case-grid" stagger>
           {projects.map((project, index) => (
-            <article key={project._id} className="panel panel-hover case-card">
+            <article key={project._id} className="panel panel-hover case-card case-card-premium">
               {project.imageUrl ? (
-                <img src={project.imageUrl} alt={project.name} className="aspect-video w-full object-cover" />
+                <img src={project.imageUrl} alt={project.name} className="case-image" loading="lazy" decoding="async" />
               ) : (
                 <ProjectVisual project={project} index={index} />
               )}
@@ -40,21 +50,25 @@ export default function Projects() {
               <div className="case-content">
                 <div className="case-header">
                   <div>
-                    <p className="case-kicker">Case study / {String(index + 1).padStart(2, '0')}</p>
+                    <p className="case-kicker">{project.category || 'Case study'} / {String(index + 1).padStart(2, '0')}</p>
                     <h2>{project.name}</h2>
                   </div>
                   <span className={`case-status ${project.featured ? 'is-featured' : ''}`}>
-                    {project.featured ? 'Featured' : 'Built'}
+                    {project.featured ? 'Featured' : project.status === 'draft' ? 'Draft' : 'Built'}
                   </span>
                 </div>
                 <p className="case-meta">{project.shortDesc}</p>
 
-                <div className="case-tags">
-                  {project.technologies?.slice(0, 4).map((item) => (
-                    <span key={item} className="case-tech">{item}</span>
-                  ))}
-                  {project.technologies?.length > 4 && <span className="case-tech">+{project.technologies.length - 4}</span>}
-                </div>
+                {(project.protocols?.length || project.technologies?.length) && (
+                  <div className="case-tags">
+                    {(project.protocols || []).slice(0, 3).map((item) => (
+                      <span key={item} className="case-tech">{item}</span>
+                    ))}
+                    {(project.technologies || []).slice(0, 2).map((item) => (
+                      <span key={item} className="case-tech">{item}</span>
+                    ))}
+                  </div>
+                )}
 
                 <div className="case-actions">
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => setSelected(project)}>
@@ -84,8 +98,8 @@ export default function Projects() {
       )}
 
       {selected && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="project-title">
-          <div className="panel modal-card">
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="project-title" onClick={() => setSelected(null)}>
+          <div className="panel modal-card" onClick={(event) => event.stopPropagation()}>
             <div className="modal-top">
               <div>
                 <p className="eyebrow"><Layers3 size={14} /> Project details</p>
@@ -101,12 +115,53 @@ export default function Projects() {
               </button>
             </div>
 
+            <div className="project-modal-summary">
+              <span className="tag">{selected.category || 'Embedded Systems'}</span>
+              {selected.featured && <span className="tag">Featured</span>}
+              {selected.status && <span className="tag">{selected.status}</span>}
+            </div>
+
             <p className="modal-copy">{selected.fullDesc || selected.shortDesc}</p>
-            <div className="skill-badges" style={{ marginTop: '1rem' }}>
-              {selected.technologies?.map((item) => (
-                <span key={item} className="tag">{item}</span>
+
+            {(selected.protocols?.length || selected.technologies?.length) && (
+              <div className="skill-badges" style={{ marginTop: '1rem' }}>
+                {[...(selected.protocols || []), ...(selected.technologies || [])].map((item) => (
+                  <span key={item} className="tag">{item}</span>
+                ))}
+              </div>
+            )}
+
+            <div className="project-detail-stack">
+              {detailSections.map((section) => (
+                <section key={section.title} className="detail-section">
+                  <h3>{section.title}</h3>
+                  <p>{section.content}</p>
+                </section>
               ))}
             </div>
+
+            {(selected.galleryImages?.length || selected.githubUrl || selected.liveUrl || selected.documentationUrl) && (
+              <div className="project-links-row">
+                {selected.galleryImages?.slice(0, 3).map((image, index) => (
+                  <img key={`${image}-${index}`} src={image} alt={`${selected.name} gallery ${index + 1}`} className="project-gallery-thumb" loading="lazy" decoding="async" />
+                ))}
+                {selected.githubUrl && (
+                  <a className="btn btn-secondary btn-sm" href={selected.githubUrl} target="_blank" rel="noreferrer">
+                    <Code2 size={15} /> Code
+                  </a>
+                )}
+                {selected.liveUrl && (
+                  <a className="btn btn-secondary btn-sm" href={selected.liveUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink size={15} /> Live demo
+                  </a>
+                )}
+                {selected.documentationUrl && (
+                  <a className="btn btn-secondary btn-sm" href={selected.documentationUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink size={15} /> Docs
+                  </a>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

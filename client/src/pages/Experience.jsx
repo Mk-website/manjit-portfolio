@@ -23,10 +23,10 @@ export default function Experience() {
           {state.data.map((role, index) => (
             <article key={role._id} className="timeline-item">
               <span className="timeline-dot" aria-hidden="true" />
-              <div className="panel panel-hover timeline-card">
+              <div className="panel panel-hover timeline-card timeline-card-premium">
                 <div className="timeline-header">
                   <div>
-                    <p className="eyebrow" style={{ fontSize: '0.64rem' }}>
+                    <p className="eyebrow eyebrow-tight">
                       {String(index + 1).padStart(2, '0')} / {role.isCurrent ? 'Current role' : 'Role history'}
                     </p>
                     <div className="timeline-role">{role.position}</div>
@@ -48,7 +48,7 @@ export default function Experience() {
                   )}
                 </div>
 
-                {role.description && <p style={{ marginTop: '1rem' }}>{role.description}</p>}
+                {role.description && <p className="timeline-summary">{role.description}</p>}
 
                 {role.responsibilities?.length > 0 && (
                   <ul className="timeline-list">
@@ -56,6 +56,14 @@ export default function Experience() {
                       <li key={`${role._id}-${itemIndex}`}>{item}</li>
                     ))}
                   </ul>
+                )}
+
+                {role.achievements?.length > 0 && (
+                  <div className="achievement-list">
+                    {role.achievements.map((item) => (
+                      <span key={item} className="achievement-chip">{item}</span>
+                    ))}
+                  </div>
                 )}
 
                 {role.technologies?.length > 0 && (

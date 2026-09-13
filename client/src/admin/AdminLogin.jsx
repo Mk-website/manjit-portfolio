@@ -45,12 +45,12 @@ export default function AdminLogin() {
         {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
         <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-sm font-medium text-gray-200">Email</label>
-            <input required type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="mt-1 w-full rounded-md border border-card-border bg-card px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="admin@example.com" />
+            <label htmlFor="admin-email" className="block text-sm font-medium text-gray-200">Email</label>
+            <input id="admin-email" required autoComplete="username" type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="mt-1 w-full rounded-md border border-card-border bg-card px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="admin@example.com" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-200">Password</label>
-            <input required type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="mt-1 w-full rounded-md border border-card-border bg-card px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="••••••••" />
+            <label htmlFor="admin-password" className="block text-sm font-medium text-gray-200">Password</label>
+            <input id="admin-password" required autoComplete="current-password" type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} className="mt-1 w-full rounded-md border border-card-border bg-card px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent" placeholder="••••••••" />
           </div>
           <button disabled={loading} type="submit" className="btn-primary w-full disabled:opacity-60">
             {loading ? 'Signing in...' : 'Sign in'}

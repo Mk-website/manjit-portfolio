@@ -5,6 +5,8 @@ const schema=new mongoose.Schema({
   issueDate:Date,
   credentialId:{type:String,default:''},
   credentialUrl:{type:String,default:''},
-  isActive:{type:Boolean,default:true}
+  description:{type:String,default:''},
+  isActive:{type:Boolean,default:true},
+  displayOrder:{type:Number,default:0}
 },{timestamps:true});
 export default mongoose.model('Certification',schema);

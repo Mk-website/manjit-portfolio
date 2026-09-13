@@ -44,6 +44,16 @@ Set `VITE_API_URL` for every Vercel environment that should load portfolio data,
 
 After frontend deployment, set Render's `CLIENT_URL` to the exact Vercel production URL, for example `https://your-portfolio.vercel.app`, and redeploy the Render service. Do not include a trailing slash. For Vercel preview deployments, use the production deployment URL for testing or add preview-origin support before sharing preview URLs.
 
+The API accepts a comma-separated list in `CLIENT_URL` when more than one browser origin must be supported, for example `https://your-portfolio.vercel.app,https://preview.example.com`. Keep this list explicit; arbitrary origins are rejected.
+
+Verify the deployed API before sharing the frontend:
+
+```bash
+curl -fsS https://your-render-service.onrender.com/api/health
+```
+
+The expected response includes `"status":"ok"`. After changing `CLIENT_URL`, `VITE_API_URL`, or any secret, redeploy the affected service and repeat this check.
+
 ## Free-tier limits
 
 Render free services may sleep when idle; the first request can be slow. MongoDB Atlas Free Tier has storage and connection limitations. Use external object storage for resume and images, since Render filesystem storage is ephemeral.

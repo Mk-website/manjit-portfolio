@@ -6,7 +6,7 @@ if (!apiUrl && import.meta.env.PROD) {
   console.error('VITE_API_URL is missing. Set it to the deployed Render API URL in Vercel.');
 }
 
-const API = axios.create({ baseURL: apiUrl, withCredentials: true });
+const API = axios.create({ baseURL: apiUrl, withCredentials: true, timeout: 12000 });
 
 API.interceptors.response.use(
   (response) => response,

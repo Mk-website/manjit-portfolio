@@ -24,4 +24,4 @@ npm run seed
 npm run dev
 ```
 
-The frontend setup and UI are added in the next implementation commit. Admin credentials are never stored in source; use `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables.
+Admin credentials are never stored in source; use `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables. See [DEPLOYMENT.md](DEPLOYMENT.md) for Vercel, Render, MongoDB Atlas, CORS, and health-check configuration.

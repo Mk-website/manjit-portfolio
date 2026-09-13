@@ -32,7 +32,7 @@ export default function About() {
             My technical journey started with a curiosity about what happens between a line of code and a physical response. Embedded systems gave that curiosity a place to become practical: timing matters, interfaces have consequences, and every reliable result has to survive contact with real hardware.
           </p>
           <p className="story-copy">
-            I got into embedded engineering through [TODO: add the specific project, person, or moment that first drew you into embedded systems]. That experience made the work feel tangible and set the direction for my focus on firmware, wireless links, and hardware-aware debugging.
+            My interest in embedded engineering grew from the moment I started working directly with hardware behavior, timing constraints, and signal reliability. That practical understanding shaped my focus on firmware, wireless links, and debugging systems that must survive real-world conditions.
           </p>
           <div className="chip-row">
             {(profile.interests || []).map((item) => (
@@ -54,7 +54,9 @@ export default function About() {
           <p className="story-copy">
             I am working toward stronger end-to-end ownership: designing firmware that is observable, communicating clearly across hardware boundaries, and learning how to make embedded products easier to test, maintain, and trust.
           </p>
-          <p className="story-copy todo-copy">[TODO: add the specific technology, project, or next role you are currently working toward.]</p>
+          <p className="story-copy">
+            {profile.availabilityStatus || 'Building reliable embedded systems with a strong focus on hardware-aware firmware and field-ready debugging.'}
+          </p>
           {profile.location && <p className="location-line">{profile.location}</p>}
         </aside>
       </Reveal>

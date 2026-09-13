@@ -26,6 +26,7 @@ export default function Skills() {
     [item.category]: [...(all[item.category] || []), item],
   }), {});
   const tools = state.data.filter((item) => toolchain.has(item.name));
+  const sortedGroups = Object.entries(groups).sort(([left], [right]) => left.localeCompare(right));
 
   return (
     <main className="page-wrap">
@@ -37,17 +38,20 @@ export default function Skills() {
       {!state.loading && (
         <>
           <Reveal className="skill-grid" stagger>
-            {Object.entries(groups).map(([category, skills]) => {
+            {sortedGroups.map(([category, skills]) => {
               const Icon = categoryIcons[category] || Wrench;
               return (
-                <section key={category} className="panel panel-hover skill-card">
+                <section key={category} className="panel panel-hover skill-card skill-card-premium">
                   <div className="skill-header">
-                    <Icon size={18} style={{ color: 'var(--accent)' }} />
+                    <span className="skill-icon"><Icon size={18} /></span>
                     <h2>{category}</h2>
                   </div>
-                  <div className="skill-badges">
+                  <div className="skill-list">
                     {skills.map((skill) => (
-                      <span className="tag" key={skill._id || skill.name}>{skill.name}</span>
+                      <div key={skill._id || skill.name} className="skill-pill-wrap">
+                        <span className="tag skill-pill">{skill.name}</span>
+                        {skill.description && <p className="skill-description">{skill.description}</p>}
+                      </div>
                     ))}
                   </div>
                 </section>
@@ -60,7 +64,7 @@ export default function Skills() {
           )}
 
           {tools.length > 0 && (
-            <Reveal as="section" className="panel toolchain">
+            <Reveal as="section" className="panel toolchain toolchain-panel">
               <p className="eyebrow">Toolchain</p>
               <div className="skill-badges">
                 {tools.map((tool) => (

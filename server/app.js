@@ -18,7 +18,14 @@ import {errorMiddleware} from './middleware/error.js';
 const app=express();
 app.set('trust proxy',1);
 app.use(helmet({contentSecurityPolicy:false}));
-app.use(cors({origin:process.env.CLIENT_URL,credentials:true}));
+const allowedOrigins=(process.env.CLIENT_URL||'').split(',').map((origin)=>origin.trim()).filter(Boolean);
+app.use(cors({
+	origin(origin,callback){
+		if(!origin||allowedOrigins.includes(origin))return callback(null,true);
+		return callback(new Error('CORS origin not allowed'));
+	},
+	credentials:true,
+}));
 app.use(express.json({limit:'250kb'}));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(mongoSanitize());
