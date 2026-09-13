@@ -25,15 +25,13 @@ ADMIN_EMAIL=<your admin email>
 ADMIN_PASSWORD=<strong unique password>
 CLIENT_URL=https://yourportfolio.pages.dev
 COOKIE_SECRET=<long random secret>
-MEDIA_BUCKET=<durable object storage bucket>
-MEDIA_REGION=<storage region>
-MEDIA_ENDPOINT=<S3-compatible endpoint>
-MEDIA_ACCESS_KEY_ID=<server-only storage access key>
-MEDIA_SECRET_ACCESS_KEY=<server-only storage secret>
-MEDIA_PUBLIC_BASE_URL=<public CDN or bucket URL>
-MEDIA_FORCE_PATH_STYLE=false
+IMAGEKIT_PUBLIC_KEY=<ImageKit public key>
+IMAGEKIT_PRIVATE_KEY=<ImageKit private key, server-only>
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/<your_imagekit_id>
 MEDIA_MAX_BYTES=5242880
 ```
+
+Create an ImageKit account and copy these values from the ImageKit developer/API settings into the Render backend environment only. `IMAGEKIT_PRIVATE_KEY` must remain server-only; do not add it to the client project, a `VITE_*` variable, source control, or browser-exposed configuration. The existing MediaManager folders are sent to ImageKit as `profile`, `projects/covers`, `projects/gallery`, and `skills`.
 
 Run `npm run seed` once using the same variables to initialize content and the sole super-admin account.
 
@@ -60,8 +58,8 @@ Verify the deployed API before sharing the frontend:
 curl -fsS https://your-render-service.onrender.com/api/health
 ```
 
-The expected response includes `"status":"ok"`. After changing `CLIENT_URL`, `VITE_API_URL`, or any secret, redeploy the affected service and repeat this check.
+The expected response includes `"status":"ok"`. Check `/api/media/health` as a deployment diagnostic; it reports `"provider":"imagekit"` only when all three ImageKit variables are configured. After changing `CLIENT_URL`, `VITE_API_URL`, ImageKit variables, or any secret, redeploy the affected service and repeat these checks.
 
 ## Free-tier limits
 
-Render free services may sleep when idle; the first request can be slow. MongoDB Atlas Free Tier has storage and connection limitations. Use the configured S3-compatible object storage bucket and public CDN/base URL for uploaded media; Render filesystem storage is not used for permanent uploads.
+Render free services may sleep when idle; the first request can be slow. MongoDB Atlas Free Tier has storage and connection limitations. ImageKit provides persistent CDN-backed media storage; Render filesystem storage is not used for permanent uploads.

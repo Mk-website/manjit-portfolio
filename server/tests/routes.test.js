@@ -13,8 +13,15 @@ test('media validation requires authentication', async () => {
   assert.equal(response.status, 401);
 });
 
+test('media upload requires authentication', async () => {
+  const response = await request(app)
+    .post('/api/media/upload')
+    .attach('file', Buffer.from('image bytes'), { filename: 'board.png', contentType: 'image/png' });
+  assert.equal(response.status, 401);
+});
+
 test('media health reports provider configuration without secrets', async () => {
   const response = await request(app).get('/api/media/health');
   assert.equal(response.status, 200);
-  assert.ok(['unconfigured', 's3-compatible'].includes(response.body.data.provider));
+  assert.ok(['unconfigured', 'imagekit'].includes(response.body.data.provider));
 });
