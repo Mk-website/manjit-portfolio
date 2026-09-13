@@ -6,9 +6,13 @@ import Profile from '../models/Profile.js';
 import Skill from '../models/Skill.js';
 import Experience from '../models/Experience.js';
 import Project from '../models/Project.js';
+import ProjectCategory from '../models/ProjectCategory.js';
 import Education from '../models/Education.js';
 import Achievement from '../models/Achievement.js';
+import SkillCategory from '../models/SkillCategory.js';
 import SiteSettings from '../models/SiteSettings.js';
+
+const categorySlug = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 const seed=async()=>{
   await mongoose.connect(process.env.MONGO_URI);
@@ -18,6 +22,15 @@ const seed=async()=>{
     await Admin.create({email,passwordHash:await bcrypt.hash(password,12),role:'superadmin'});
   }
   if(!await Profile.findOne())await Profile.create({});
+  const skillCategoryNames = ['Languages','Microcontrollers','RTOS','Wireless & IoT','Protocols','Tools','Hardware','Testing','Version Control'];
+  for(const [displayOrder,name] of skillCategoryNames.entries()){
+    await SkillCategory.updateOne({slug:categorySlug(name)},{$setOnInsert:{name,slug:categorySlug(name),displayOrder,isActive:true}},{upsert:true});
+  }
+  const projectCategory = await ProjectCategory.findOneAndUpdate(
+    {slug:'embedded-systems'},
+    {$setOnInsert:{name:'Embedded Systems',slug:'embedded-systems',displayOrder:0,isActive:true}},
+    {upsert:true,new:true},
+  );
   if(!await Skill.countDocuments()){
     await Skill.insertMany(
       ['Embedded C','C++','STM32 HAL','STM32F401','Arduino Nano/AVR','Bare-metal programming','FreeRTOS','LoRa SX1262','NRF24L01','GPS NEO-6M','LoRaWAN concepts','UART','SPI','I2C','STM32CubeIDE','STM32CubeProgrammer','Arduino IDE','Keil IDE','PCB debugging','DSO','Logic Analyzer','Spectrum Analyzer','LCR Meter','Multimeter','RF Signal Generator','VNA','Git','GitHub']
@@ -34,6 +47,10 @@ const seed=async()=>{
         displayOrder
       }))
     );
+  }
+  const skillCategories = await SkillCategory.find();
+  for(const category of skillCategories){
+    await Skill.updateMany({category:category.name,categoryId:null},{$set:{categoryId:category._id,categoryName:category.name,categorySlug:category.slug}});
   }
   if(!await Experience.countDocuments()){
     await Experience.insertMany([
@@ -76,6 +93,10 @@ const seed=async()=>{
         name:'Bare-Metal STM32 Programming',
         shortDesc:'Register-level peripheral interfacing on STM32F401CCU6 without HAL.',
         fullDesc:'Implemented LCD interfacing, ADXL345 accelerometer over I2C and SPI, and register-level UART routines.',
+        categoryId:projectCategory._id,
+        categoryName:projectCategory.name,
+        categorySlug:projectCategory.slug,
+        category:projectCategory.name,
         technologies:['STM32F401CCU6','Register-level','LCD','ADXL345','I2C','SPI','UART'],
         featured:true,
         displayOrder:0
@@ -84,6 +105,10 @@ const seed=async()=>{
         name:'Smart Weather Monitoring System',
         shortDesc:'ESP32 weather node publishing telemetry to Azure IoT Hub with Logic Apps alerts.',
         fullDesc:'Built an ESP32-based weather node for real-time sensor telemetry and configured Azure Logic Apps for cloud-side automation and alerts.',
+        categoryId:projectCategory._id,
+        categoryName:projectCategory.name,
+        categorySlug:projectCategory.slug,
+        category:projectCategory.name,
         technologies:['ESP32','Azure IoT Hub','Logic Apps','IoT'],
         displayOrder:1
       }

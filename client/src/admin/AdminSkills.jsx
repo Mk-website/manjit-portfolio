@@ -8,9 +8,25 @@ const emptyForm = { name: '', category: '', categoryId: '', categoryName: '', de
 
 export default function AdminSkills() {
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState('');
 
   useEffect(() => {
-    api.skillCategories.get().then((res) => setCategories(res.data.data || [])).catch(() => setCategories([]));
+    let active = true;
+    api.skillCategories.get()
+      .then((res) => {
+        if (!active) return;
+        setCategories(Array.isArray(res.data?.data) ? res.data.data : []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCategories([]);
+        setCategoriesError('Could not load skill categories. Refresh and try again.');
+      })
+      .finally(() => {
+        if (active) setCategoriesLoading(false);
+      });
+    return () => { active = false; };
   }, []);
 
   return (
@@ -19,6 +35,15 @@ export default function AdminSkills() {
       description="Manage technical skills shown on your portfolio."
       resource={api.skills}
       emptyForm={emptyForm}
+      normalizeForm={(form) => {
+        const selected = categories.find((category) => String(category._id) === String(form.categoryId))
+          || categories.find((category) => category.name === form.categoryName
+            || category.name === form.category
+            || category.slug === form.categorySlug);
+        return selected
+          ? { ...form, categoryId: selected._id, categoryName: selected.name, category: selected.name }
+          : form;
+      }}
       columns={[
         { key: 'name', label: 'Name' },
         { key: 'category', label: 'Category' },
@@ -26,7 +51,13 @@ export default function AdminSkills() {
         { key: 'displayOrder', label: 'Order' },
         { key: 'isActive', label: 'Active', render: (item) => item.isActive ? 'Yes' : 'No' },
       ]}
-      renderForm={(form, setForm) => (
+      renderForm={(form, setForm) => {
+        const selectedCategory = categories.find((category) => String(category._id) === String(form.categoryId))
+          || categories.find((category) => category.name === form.categoryName
+            || category.name === form.category
+            || category.slug === form.categorySlug);
+
+        return (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
@@ -34,7 +65,7 @@ export default function AdminSkills() {
             <Input label="Display order" type="number" value={form.displayOrder} onChange={(e) => setForm((f) => ({ ...f, displayOrder: Number(e.target.value) }))} />
             <Input label="Icon (optional)" value={form.icon} onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))} />
           </div>
-          <Select label="Category" value={form.categoryId || form.category || ''} onChange={(e) => {
+          <Select label="Category" value={selectedCategory?._id || form.categoryId || ''} disabled={categoriesLoading} onChange={(e) => {
             const selected = categories.find((category) => String(category._id) === e.target.value);
             setForm((f) => ({
               ...f,
@@ -43,12 +74,13 @@ export default function AdminSkills() {
               category: selected ? selected.name : f.category || '',
             }));
           }}>
-            <option value="">Select category</option>
+            <option value="">{categoriesLoading ? 'Loading categories...' : 'Select category'}</option>
             {categories.map((category) => (
               <option key={category._id} value={category._id}>{category.name}</option>
             ))}
           </Select>
-          {categories.length === 0 && <p className="text-sm text-amber-300">Create an active skill category before assigning this skill.</p>}
+          {categoriesError && <p className="text-sm text-red-300">{categoriesError}</p>}
+          {!categoriesLoading && !categoriesError && categories.length === 0 && <p className="text-sm text-amber-300">Create an active skill category before assigning this skill.</p>}
           <textarea
             value={form.description || ''}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -59,7 +91,8 @@ export default function AdminSkills() {
           <Checkbox label="Active" checked={!!form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
           <MediaManager label="Skill icon / image" value={form.media} onChange={(value) => setForm((f) => ({ ...f, media: value }))} folder="skills" />
         </>
-      )}
+        );
+      }}
     />
   );
 }

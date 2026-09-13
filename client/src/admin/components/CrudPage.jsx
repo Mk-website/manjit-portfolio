@@ -9,6 +9,7 @@ export default function CrudPage({
   columns,
   emptyForm,
   renderForm,
+  normalizeForm = (value) => value,
   getRowKey = (item) => item._id,
   getRowTitle = (item) => item.name || item.title || item.company || 'Item',
   getRowSubtitle = () => '',
@@ -45,7 +46,7 @@ export default function CrudPage({
   }
 
   function openEdit(item) {
-    setForm({ ...emptyForm, ...item });
+    setForm(normalizeForm({ ...emptyForm, ...item }));
     setModal({ mode: 'edit', id: getRowKey(item) });
     setError('');
     setSuccess('');
@@ -62,11 +63,12 @@ export default function CrudPage({
     setError('');
     setSuccess('');
     try {
+      const payload = normalizeForm(form);
       if (modal.mode === 'create') {
-        await resource.create(form);
+        await resource.create(payload);
         setSuccess('Item created.');
       } else {
-        await resource.update(modal.id, form);
+        await resource.update(modal.id, payload);
         setSuccess('Item updated.');
       }
       closeModal();

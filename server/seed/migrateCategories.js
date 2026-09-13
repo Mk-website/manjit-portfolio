@@ -4,6 +4,7 @@ import Project from '../models/Project.js';
 import ProjectCategory from '../models/ProjectCategory.js';
 import Skill from '../models/Skill.js';
 import SkillCategory from '../models/SkillCategory.js';
+import { slugify } from '../utils/validation.js';
 
 async function migrate(Model, CategoryModel, label) {
   const categories = await CategoryModel.find();
@@ -12,8 +13,17 @@ async function migrate(Model, CategoryModel, label) {
   let matched = 0;
   for (const record of records) {
     const legacyName = String(record.categoryName || record.category || '').trim().toLowerCase();
-    const category = byName.get(legacyName);
-    if (!category) continue;
+    if (!legacyName) continue;
+    let category = byName.get(legacyName);
+    if (!category) {
+      const displayName = String(record.categoryName || record.category).trim();
+      category = await CategoryModel.findOneAndUpdate(
+        { slug: slugify(displayName) },
+        { $setOnInsert: { name: displayName, slug: slugify(displayName), isActive: true } },
+        { upsert: true, new: true },
+      );
+      byName.set(legacyName, category);
+    }
     await Model.updateOne({ _id: record._id, categoryId: null }, { $set: { categoryId: category._id, category: category.name, categoryName: category.name, categorySlug: category.slug } });
     matched += 1;
   }

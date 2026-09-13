@@ -36,9 +36,25 @@ const emptyForm = {
 
 export default function AdminProjects() {
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState('');
 
   useEffect(() => {
-    api.projectCategories.get().then((res) => setCategories(res.data.data || [])).catch(() => setCategories([]));
+    let active = true;
+    api.projectCategories.get()
+      .then((res) => {
+        if (!active) return;
+        setCategories(Array.isArray(res.data?.data) ? res.data.data : []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCategories([]);
+        setCategoriesError('Could not load project categories. Refresh and try again.');
+      })
+      .finally(() => {
+        if (active) setCategoriesLoading(false);
+      });
+    return () => { active = false; };
   }, []);
 
   return (
@@ -47,13 +63,28 @@ export default function AdminProjects() {
       description="Manage portfolio projects including drafts."
       resource={api.projects}
       emptyForm={emptyForm}
+      normalizeForm={(form) => {
+        const selected = categories.find((category) => String(category._id) === String(form.categoryId))
+          || categories.find((category) => category.name === form.categoryName
+            || category.name === form.category
+            || category.slug === form.categorySlug);
+        return selected
+          ? { ...form, categoryId: selected._id, categoryName: selected.name, category: selected.name }
+          : form;
+      }}
       columns={[
         { key: 'name', label: 'Name' },
         { key: 'shortDesc', label: 'Summary' },
         { key: 'status', label: 'Status' },
         { key: 'featured', label: 'Featured', render: (item) => item.featured ? 'Yes' : 'No' },
       ]}
-      renderForm={(form, setForm) => (
+      renderForm={(form, setForm) => {
+        const selectedCategory = categories.find((category) => String(category._id) === String(form.categoryId))
+          || categories.find((category) => category.name === form.categoryName
+            || category.name === form.category
+            || category.slug === form.categorySlug);
+
+        return (
         <>
           <p className="border-b border-cyan-900 pb-2 font-mono text-xs text-cyan-400">BASIC</p>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -61,7 +92,7 @@ export default function AdminProjects() {
             <Input label="Slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
             <Input label="Display order" type="number" value={form.displayOrder} onChange={(e) => setForm((f) => ({ ...f, displayOrder: Number(e.target.value) }))} />
           </div>
-          <Select label="Category" value={form.categoryId || form.category || ''} onChange={(e) => {
+          <Select label="Category" value={selectedCategory?._id || form.categoryId || ''} disabled={categoriesLoading} onChange={(e) => {
             const selected = categories.find((category) => String(category._id) === e.target.value);
             setForm((f) => ({
               ...f,
@@ -70,12 +101,13 @@ export default function AdminProjects() {
               category: selected ? selected.name : f.category || '',
             }));
           }}>
-            <option value="">Select category</option>
+            <option value="">{categoriesLoading ? 'Loading categories...' : 'Select category'}</option>
             {categories.map((category) => (
               <option key={category._id} value={category._id}>{category.name}</option>
             ))}
           </Select>
-          {categories.length === 0 && <p className="text-sm text-amber-300">Create an active project category before creating a project.</p>}
+          {categoriesError && <p className="text-sm text-red-300">{categoriesError}</p>}
+          {!categoriesLoading && !categoriesError && categories.length === 0 && <p className="text-sm text-amber-300">Create an active project category before creating a project.</p>}
           <Input label="Short description" value={form.shortDesc} onChange={(e) => setForm((f) => ({ ...f, shortDesc: e.target.value }))} required />
           <Textarea label="Full description" value={form.fullDesc} onChange={(e) => setForm((f) => ({ ...f, fullDesc: e.target.value }))} />
           <Textarea label="Problem" value={form.problem} onChange={(e) => setForm((f) => ({ ...f, problem: e.target.value }))} />
@@ -107,7 +139,8 @@ export default function AdminProjects() {
             <Checkbox label="Active" checked={!!form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
           </div>
         </>
-      )}
+        );
+      }}
     />
   );
 }
