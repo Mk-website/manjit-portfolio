@@ -38,7 +38,8 @@ export const api = {
       const body = new FormData();
       body.append('file', file);
       body.append('folder', folder);
-      return API.post('/api/media/upload', body, { headers: { 'Content-Type': 'multipart/form-data' } });
+      // Let the browser add the multipart boundary to FormData.
+      return API.post('/api/media/upload', body);
     },
     validate: (url) => API.post('/api/media/validate', { url }),
     remove: (key) => API.delete(`/api/media/${key}`),

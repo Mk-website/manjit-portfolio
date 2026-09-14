@@ -81,13 +81,21 @@ export async function uploadMedia(file, folder = 'portfolio', { imageKitClient, 
   const safeFolder = normalizeFolder(folder);
   const fileName = `${crypto.randomUUID()}${extensionByMime[file.mimetype]}`;
   const client = imageKitClient || getImageKitClient(env);
-  const response = await client.files.upload({
-    file: await toFile(file.buffer, fileName),
-    fileName,
-    folder: `/${safeFolder}`,
-    useUniqueFileName: false,
-    overwriteFile: false,
-  });
+  let response;
+  try {
+    response = await client.files.upload({
+      file: await toFile(file.buffer, fileName),
+      fileName,
+      folder: `/${safeFolder}`,
+      useUniqueFileName: false,
+      overwriteFile: false,
+    });
+  } catch (error) {
+    const providerError = new Error('Image storage upload failed. Check the server ImageKit configuration and logs.');
+    providerError.statusCode = 502;
+    providerError.cause = error;
+    throw providerError;
+  }
 
   return normalizeUploadResponse(response, file, safeFolder);
 }

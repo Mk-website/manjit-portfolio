@@ -87,3 +87,12 @@ test('delete passes the ImageKit file ID to the provider', async () => {
   assert.equal(await deleteMedia('imagekit-file-id', { imageKitClient: fakeClient }), true);
   assert.equal(deleted, 'imagekit-file-id');
 });
+
+test('upload reports missing ImageKit configuration without exposing secrets', async () => {
+  await assert.rejects(
+    uploadMedia(validFile(), 'projects/covers', { env: {} }),
+    (error) => error.statusCode === 503
+      && error.message.includes('IMAGEKIT_PUBLIC_KEY')
+      && !error.message.includes('private_'),
+  );
+});
